@@ -68,9 +68,7 @@ public class Main {
     }
 
     private static void savingFileToDisc(String fileUrl, String fileName) throws IOException {
-        //Чтобы прочитать файл, мы будем использовать метод openStream() для получения InputStream
-        // Для записи байтов, считанных с URL-адреса, в ваш локальный файл
-        // мы будем использовать метод write() из класса FileOutputStream :
+
 
         try (BufferedInputStream in = new BufferedInputStream(new URL(fileUrl).openStream());
              FileOutputStream fileOutputStream = new FileOutputStream(fileUrl)) {
@@ -80,7 +78,7 @@ public class Main {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
             }
         } catch (IOException e) {
-            // handle exception
+
         }
         InputStream in = new URL(fileUrl).openStream();
         Files.copy(in, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING);
