@@ -9,10 +9,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-import java.io.BufferedInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -49,16 +46,15 @@ public class Main {
 
         Nasa nasa = mapper.readValue(response.getEntity().getContent(), Nasa.class);
 
-        System.out.println(nasa);
+        HttpGet secondRequest = new HttpGet(nasa.getUrl());
+        CloseableHttpResponse secondResponse = httpClient.execute(secondRequest);
+        byte[] bytes = secondResponse.getEntity().getContent().readAllBytes();
+        File file = new File("NasaImage.jpg");
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+        bos.write(bytes);
+        bos.flush();
+        bos.close();
 
-        String fileUrl = nasa.getUrl();
-        String fileName = Paths.get(nasa.getUrl()).getFileName().toString();
-
-        request = new HttpGet(fileUrl);
-        response = httpClient.execute(request);
-        Arrays.stream(response.getAllHeaders()).forEach(System.out::println);
-
-        savingFileToDisc(fileUrl, fileName);
 
 
 
@@ -67,20 +63,5 @@ public class Main {
 
     }
 
-    private static void savingFileToDisc(String fileUrl, String fileName) throws IOException {
 
-
-        try (BufferedInputStream in = new BufferedInputStream(new URL(fileUrl).openStream());
-             FileOutputStream fileOutputStream = new FileOutputStream(fileUrl)) {
-            byte dataBuffer[] = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                fileOutputStream.write(dataBuffer, 0, bytesRead);
-            }
-        } catch (IOException e) {
-
-        }
-        InputStream in = new URL(fileUrl).openStream();
-        Files.copy(in, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING);
-    }
 }
