@@ -48,20 +48,39 @@ public class Main {
 
         HttpGet secondRequest = new HttpGet(nasa.getUrl());
         CloseableHttpResponse secondResponse = httpClient.execute(secondRequest);
-        byte[] bytes = secondResponse.getEntity().getContent().readAllBytes();
-        File file = new File("NasaImage.jpg");
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-        bos.write(bytes);
-        bos.flush();
-        bos.close();
+
+        String imageUrl = nasa.getUrl();
+        String fileName = Paths.get(nasa.getUrl()).getFileName().toString();
 
 
+        // Скачиваем изображение
+        try {
+            downloadImage(imageUrl, fileName);
+            System.out.println("Изображение успешно загружено и сохранено как " + fileName);
+        } catch (Exception e) {
+            System.out.println("Ошибка при загрузке изображения: " + e.getMessage());
+        }
+    }
 
-
-
-
-
+    // Метод для загрузки изображения
+    private static void downloadImage(String imageUrl, String fileName) throws Exception {
+        try (InputStream in = new URL(imageUrl).openStream();
+             FileOutputStream out = new FileOutputStream(fileName)) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = in.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
+        }
     }
 
 
 }
+
+
+
+
+
+
+
+
